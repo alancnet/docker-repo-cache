@@ -49,7 +49,7 @@ if (isBuild) {
 	}
 
 	// Locate the Dockerfile.
-	var dockerfileName = readArg(args, 'f', 'file') || 'Dockerfile';
+	var dockerfileName = (readArg(args, 'f', 'file') || 'Dockerfile').replace(/"/g, '');
 	var dockerfileFolder = args[args.length - 1];
 	var dockerfilePath = [dockerfileFolder, dockerfileName].join('/');
 

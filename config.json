@@ -1,0 +1,3 @@
+{
+    "triggers": ["apt-get", "npm", "pypi", "rubygems", "ubuntu"]
+}

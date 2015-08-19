@@ -49,9 +49,8 @@ if (isBuild) {
 	}
 
 	// Locate the Dockerfile.
-	var dockerfileName = (readArg(args, 'f', 'file') || 'Dockerfile').replace(/"/g, '');
 	var dockerfileFolder = args[args.length - 1];
-	var dockerfilePath = [dockerfileFolder, dockerfileName].join('/');
+	var dockerfilePath = (readArg(args, 'f', 'file') || dockerfileFolder + '/Dockerfile').replace(/"/g, '');
 
 	// Read the dockerfile into memory
 	var original = fs.readFileSync(dockerfilePath,'utf8');
@@ -72,22 +71,27 @@ if (isBuild) {
 	])
 
 	// Rearrange docker arguments
-	var dockerfileTempName = dockerfileName + '.tmp~~';
 	var dockerfileTempPath = dockerfilePath + '.tmp~~';
+	console.log('dockerfileTempPath:', dockerfileTempPath);
 	var fileArgIndex = indexOfArg(args, 'f', 'file');
+	console.log('fileArgIndex', fileArgIndex);
 	var newArgs;
 	if (fileArgIndex == -1) {
 		// Insert "--file Dockerfile.tmp~~" as last parameter before path
-		newArgs = args.slice(0, args.length - 1).concat(['--file', dockerfileTempName]).concat(args.slice(-1));
+		newArgs = args.slice(0, args.length - 1).concat(['--file', dockerfileTempPath]).concat(args.slice(-1));
+		console.log('newArgs', newArgs);
 	} else {
 		var fileArg = args[fileArgIndex];
+		console.log('fileArg', fileArg);
 		// Replace user-specified dockerfile with "Dockerfile.tmp~~"
 		if (fileArg.indexOf('=') == -1) {
-			newArgs = args.slice(0, fileArgIndex + 1).concat([dockerfileTempName]).concat(args.slice(fileArgIndex + 2));
+			newArgs = args.slice(0, fileArgIndex + 1).concat([dockerfileTempPath]).concat(args.slice(fileArgIndex + 2));
+			console.log('newArgs', newArgs);
 		} else {
 			newArgs = args.slice(0, fileArgIndex)
-				.concat([fileArg.split('=')[0] + '=' + dockerfileTempName])
+				.concat([fileArg.split('=')[0] + '=' + dockerfileTempPath])
 				.concat(args.slice(fileArgIndex + 1));
+				console.log('newArgs', newArgs);
 		}
 	}
 	var dockerArgs  = newArgs.map(function(arg) {
@@ -97,7 +101,7 @@ if (isBuild) {
 
 	fs.writeFileSync(dockerfileTempPath, newLines.join('\n'), 'utf8');
 
-	console.log('/usr/bin/docker ' + dockerArgs)
+	console.log('Proxing exec: /usr/bin/docker ' + dockerArgs)
 	spawn('/usr/bin/docker', newArgs, {
 		stdio: [process.stdin, process.stdout, process.stderr]
 	}).on('close', function(code) {

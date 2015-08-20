@@ -1,3 +1,6 @@
+![DEVELOPMENT USE ONLY](http://i.imgur.com/2wGpcc7.png)
+![NOT FOR PRODUCTION](http://i.imgur.com/TvsNuSX.png)
+
 # docker-repo-cache
 A utility to transparently alter the `docker build` process to use a local cacher for HTTP requests.
 
